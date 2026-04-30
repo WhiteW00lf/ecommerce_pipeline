@@ -19,7 +19,7 @@ def generate_products():
         product_dict["product_name"].append(random.choice(products))
         product_dict["price"].append(round(random.uniform(500, 2000), 2))
         product_dict["stock"].append(random.randint(0, 100))
-        product_dict["category"].append(random.choice(["Electronics", "Gadgets", "Accessories"]))
+        product_dict["category"].append(random.choice(products))
 
     df = pd.DataFrame(product_dict)
     df.to_csv(f"data/raw/{date.today()}_products.csv", mode="a", index=False)
@@ -71,7 +71,7 @@ def generate_orders():
         order_dict["price"].append(round(random.uniform(500, 2000), 2))
         order_dict["order_date"].append(faker.Faker().date_time_this_year())
         order_dict["delivery_date"].append(faker.Faker().date_time_this_year())
-        order_dict["status"].append(random.choice(["Pending", "Shipped", "Delivered"]))
+        order_dict["status"].append(random.choice(["Pending", "Shipped", "Delivered", "Cancelled"]))
 
     df = pd.DataFrame(order_dict)
     df.to_csv(f"data/raw/{date.today()}_orders.csv", mode="a", index=False)
