@@ -1,0 +1,3 @@
+pandas
+faker
+dbt-postgres
