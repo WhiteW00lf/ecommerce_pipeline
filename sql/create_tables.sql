@@ -12,7 +12,8 @@ CREATE TABLE "raw".customers (
     first_name VARCHAR(50) NOT NULL,
     last_name VARCHAR(50) NOT NULL,
     address TEXT NOT NULL,
-    loyalty_tier loyalty_tier_type 
+    loyalty_tier loyalty_tier_type,
+    last_updated TIMESTAMP NOT NULL
 );
 
 CREATE TABLE "raw".products (
