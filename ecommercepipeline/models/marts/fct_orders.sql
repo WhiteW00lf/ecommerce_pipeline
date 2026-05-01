@@ -14,5 +14,5 @@ SELECT
     o.quantity * o.price AS total_order_value
 
 FROM {{ ref('stg_orders') }} AS o
-JOIN {{ ref('stg_customer') }} AS c ON o.customer_id = c.customer_id
+JOIN {{ ref('stg_customers') }} AS c ON o.customer_id = c.customer_id
 JOIN {{ ref('stg_products') }} AS p ON o.product_id = p.product_id
