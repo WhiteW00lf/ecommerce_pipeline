@@ -7,4 +7,4 @@ SELECT
 FROM {{ ref('fct_orders') }}
 WHERE status != 'cancelled'
 GROUP BY order_date 
-ORDER BY order_date ASC;
+ORDER BY order_date ASC
