@@ -1,15 +1,25 @@
-Welcome to your new dbt project!
+## Ecommerce Data Pipeline
 
-### Using the starter project
+End-to-end pipeline built with Python, dbt, Airflow, and PostgreSQL on EC2.
 
-Try running the following commands:
-- dbt run
-- dbt test
+## Architecture
+![Architecture](../lean_arch.drawio.png)
 
+## Pipeline
+1. Python generates daily order/customer/product data
+2. Loads into PostgreSQL raw schema
+3. dbt transforms Bronze → Silver → Gold
+4. Airflow orchestrates daily at 6am
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+## Design decisions
+- Local disk over S3 to keep scope tight — swap in boto3 for production
+- Raw FK constraints intentionally kept to enforce data integrity at ingestion
+- dbt relationships tests enforce referential integrity at transformation layer
+
+## How to run
+[steps here]
+
+## Next steps
+- SCD Type 2 for customer history
+- S3 as object storage layer
+- Great Expectations for advanced data quality
