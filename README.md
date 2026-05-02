@@ -16,8 +16,6 @@ End-to-end pipeline built with Python, dbt, Airflow, and PostgreSQL on EC2.
 - Raw FK constraints intentionally kept to enforce data integrity at ingestion
 - dbt relationships tests enforce referential integrity at transformation layer
 
-## How to run
-[steps here]
 
 ## Next steps
 - SCD Type 2 for customer history
