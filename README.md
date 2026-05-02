@@ -3,7 +3,7 @@
 End-to-end pipeline built with Python, dbt, Airflow, and PostgreSQL on EC2.
 
 ## Architecture
-![Architecture](../lean_arch.drawio.png)
+![Architecture](lean_arch.drawio.png)
 
 ## Pipeline
 1. Python generates daily order/customer/product data
