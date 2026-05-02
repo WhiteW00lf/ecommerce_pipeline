@@ -1,8 +1,10 @@
 from datetime import date
+from sqlalchemy import create_engine,text
 import pandas as pd
 import random
 import faker
 
+data_dir = "/home/ubuntu/ecommerce_pipeline/data/raw"
 
 
 def generate_products():
@@ -11,10 +13,21 @@ def generate_products():
         "product_name": [],
         "price": [],
         "stock": [],
-        "category": []
+        "category": [],
     }
-    products = ["Television", "Laptop", "Smartphone", "Headphones", "Camera", "Smartwatch", "Tablet", "Printer", "Monitor", "Speaker"]
-    for product in range(1,2001):
+    products = [
+        "Television",
+        "Laptop",
+        "Smartphone",
+        "Headphones",
+        "Camera",
+        "Smartwatch",
+        "Tablet",
+        "Printer",
+        "Monitor",
+        "Speaker",
+    ]
+    for product in range(1, 2001):
         product_dict["product_id"].append(product)
         product_dict["product_name"].append(random.choice(products))
         product_dict["price"].append(round(random.uniform(500, 2000), 2))
@@ -22,7 +35,7 @@ def generate_products():
         product_dict["category"].append(random.choice(products))
 
     df = pd.DataFrame(product_dict)
-    df.to_csv(f"data/raw/{date.today()}_products.csv", mode="a", index=False)
+    df.to_csv(f"{data_dir}/{date.today()}_products.csv", mode="w", index=False)
     print("Product data generated successfully.")
 
 
@@ -33,8 +46,7 @@ def generate_customers():
         "last_name": [],
         "address": [],
         "loyalty_tier": [],
-        "last_updated": []
-
+        "last_updated": [],
     }
 
     for customer in range(1, 2001):
@@ -42,13 +54,14 @@ def generate_customers():
         customer_dict["first_name"].append(faker.Faker().first_name())
         customer_dict["last_name"].append(faker.Faker().last_name())
         customer_dict["address"].append(faker.Faker().address())
-        customer_dict["loyalty_tier"].append(random.choice(["Bronze", "Silver", "Gold"]))
+        customer_dict["loyalty_tier"].append(
+            random.choice(["Bronze", "Silver", "Gold"])
+        )
         customer_dict["last_updated"].append(faker.Faker().date_time_this_year())
 
     df = pd.DataFrame(customer_dict)
-    df.to_csv(f"data/raw/{date.today()}_customers.csv", mode="a", index=False)
+    df.to_csv(f"{data_dir}/{date.today()}_customers.csv", mode="w", index=False)
     print("Customer data generated successfully.")
-
 
 
 def generate_orders():
@@ -60,7 +73,7 @@ def generate_orders():
         "price": [],
         "order_date": [],
         "delivery_date": [],
-        "status": []
+        "status": [],
     }
 
     for order in range(1, 2001):
@@ -71,18 +84,42 @@ def generate_orders():
         order_dict["price"].append(round(random.uniform(500, 2000), 2))
         order_dict["order_date"].append(faker.Faker().date_time_this_year())
         order_dict["delivery_date"].append(faker.Faker().date_time_this_year())
-        order_dict["status"].append(random.choice(["Pending", "Shipped", "Delivered", "Cancelled"]))
+        order_dict["status"].append(
+            random.choice(["Pending", "Shipped", "Delivered", "Cancelled"])
+        )
 
     df = pd.DataFrame(order_dict)
-    df.to_csv(f"data/raw/{date.today()}_orders.csv", mode="a", index=False)
+    df.to_csv(f"{data_dir}/{date.today()}_orders.csv", mode="w", index=False)
     print("Order data generated successfully.")
 
 
+def load_to_postgres():
+    print("Loading into postgres now")
+    engine = create_engine("postgresql://postgres:new_password@localhost:5432/ecom")
+    today = date.today().strftime("%Y-%m-%d")
+
+    # load each file
+    customers = pd.read_csv(f"{data_dir}/{today}_customers.csv",header=0)
+    orders = pd.read_csv(f"{data_dir}/{today}_orders.csv",header=0)
+    products = pd.read_csv(f"{data_dir}/{today}_products.csv",header=0)
+
+    with engine.connect() as conn:
+        # truncate in correct order to respect FK constraints
+        conn.execute(text("TRUNCATE TABLE raw.orders CASCADE;"))
+        conn.execute(text("TRUNCATE TABLE raw.customers CASCADE;"))
+        conn.execute(text("TRUNCATE TABLE raw.products CASCADE;"))
+        conn.commit()
+
+    products.to_sql("products", engine, schema="raw", if_exists="append", index=False)
+    customers.to_sql("customers", engine, schema="raw", if_exists="append", index=False)
+    orders.to_sql("orders", engine, schema="raw", if_exists="append", index=False)
+
+
+    print("Done loading to postgres")
 
 
 if __name__ == "__main__":
     generate_products()
     generate_customers()
     generate_orders()
-
-
+    load_to_postgres()
